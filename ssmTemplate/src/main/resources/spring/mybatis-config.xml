@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <settings>
+        <!-- 全局启用或禁用此配置下任何映射器中配置的任何高速缓存 -->
+        <setting name="cacheEnabled" value="false"/>
+
+        <!-- 设置驱动程序等待数据库响应的秒数 -->
+        <setting name="defaultStatementTimeout" value="5"/>
+
+        <!-- 驼峰命名法: 从经典数据库列名A_COLUMN到驼峰式经典Java属性名称aColumn的自动映射 -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+
+        <!-- 使用jdbc的getGeneratedKeys获取数据库自增主键值 -->
+        <setting name="useGeneratedKeys" value="true"/>
+
+    </settings>
+
+    <plugins>
+        <!--分页助手配置-->
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!-- 设置数据库类型 Oracle,Mysql,MariaDB,SQLite,Hsqldb,PostgreSQL六种数据库-->
+            <property name="helperDialect" value="mysql"/>
+            <property name="reasonable" value="true"/>
+            <property name="supportMethodsArguments" value="true"/>
+            <property name="autoRuntimeDialect" value="true"/>
+        </plugin>
+    </plugins>
+
+
+</configuration>
+

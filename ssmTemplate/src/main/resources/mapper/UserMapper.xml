@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yusheng.dao.UserMapper">
+    <update id="updateUser" parameterType="com.yusheng.pojo.User">
+        update user
+        <set>
+            <if test="uName!=null">
+                u_name=#{uName},
+            </if>
+            <if test="uPassword!=null">
+                u_password=#{uPassword},
+            </if>
+        </set>
+        <where>
+            <if test="uId!=null">
+                u_id = #{uId}
+            </if>
+        </where>
+    </update>
+
+    <select id="getUserByName" resultType="com.yusheng.pojo.User">
+          select * from user where u_name=#{uName}
+    </select>
+</mapper>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+">
+
+
+    <!-- 配置整合mybatis过程 -->
+    <!-- 1.配置数据库相关参数properties的属性：${url} -->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+
+    <!-- 2.数据库连接池 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <!-- 配置连接池属性 -->
+        <property name="driverClass" value="${jdbc.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <!-- c3p0连接池的私有属性 -->
+        <property name="maxPoolSize" value="${jdbc.minPoolSize}"/>
+        <property name="minPoolSize" value="${jdbc.minPoolSize}"/>
+        <!-- 关闭连接后不自动commit -->
+        <property name="autoCommitOnClose" value="false"/>
+        <!-- 获取连接超时时间 -->
+        <property name="checkoutTimeout" value="${jdbc.checkoutTimeout}"/>
+        <!-- 当获取连接失败重试次数 -->
+        <property name="acquireRetryAttempts" value="${jdbc.acquireRetryAttempts}"/>
+
+    </bean>
+
+    <!-- 3.配置SqlSessionFactory对象 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 注入数据库连接池 -->
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 配置MyBaties全局配置文件:mybatis-config.xml -->
+        <property name="configLocation" value="classpath:spring/mybatis-config.xml"/>
+        <!-- 扫描sql配置文件:dao.xml文件 -->
+        <property name="mapperLocations" value="classpath:mapper/**/*.xml"/>
+        <!--启用别名-->
+        <!--<property name="typeAliasesPackage" value="com.yusheng.pojo"/>-->
+    </bean>
+
+    <!-- 4.配置扫描Dao接口包，动态实现Dao接口，注入到spring容器中 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 注入sqlSessionFactory -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!-- 给出需要扫描Dao接口包 -->
+        <property name="basePackage" value="com.yusheng.dao"/>
+    </bean>
+
+    <!--6. 配置事务 -->
+    <!--启动注释，扫描组件包-->
+    <context:annotation-config/>
+    <context:component-scan base-package="com.yusheng.service"/>
+    <!-- 配置事务管理器 -->
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 注入数据库连接池 -->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!-- 基本事务策略 -->
+    <tx:advice transaction-manager="transactionManager" id="transactionAdvice">
+        <tx:attributes>
+            <!-- 查询相关配置为只读 -->
+            <tx:method name="select*" read-only="true"/>
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="query*" read-only="true"/>
+            <!-- 修改相关 ，一旦有异常就事务回滚-->
+            <tx:method name="delete*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="update*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="insert*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="add*" propagation="REQUIRED" rollback-for="Exception"/>
+        </tx:attributes>
+    </tx:advice>
+    <!-- 事务是在aop基础上完成的 -->
+    <aop:config>
+        <aop:pointcut id="txCut" expression="execution(* com.yusheng.service..*.*(..))"/>
+        <aop:advisor advice-ref="transactionAdvice" pointcut-ref="txCut"/>
+    </aop:config>
+    <!-- 配置基于注解的声明式事务，就是在service的实现类上加上@Transanctional注释 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+
+</beans>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC
+        "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+
+    <!--该模式生成的代码没有example-->
+    <!--<context id="context" targetRuntime="MyBatis3Simple">-->
+    <context id="context" targetRuntime="MyBatis3">
+        <commentGenerator>
+            <property name="suppressDate" value="true"/>
+            <property name="suppressAllComments" value="true" />
+        </commentGenerator>
+
+        <jdbcConnection userId="root" password="xuanfeng" driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://127.0.0.1:3306/ssm"/>
+
+        <!--自动注释-->
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+
+        <!--pojo类-->
+        <javaModelGenerator targetPackage="com.yusheng.pojo" targetProject=".\src\main\Java">
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <!--dao.xml-->
+        <sqlMapGenerator targetPackage="mapper" targetProject=".\src\main\resources">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+
+        <!--dao接口:dao.java-->
+        <javaClientGenerator targetPackage="com.yusheng.dao" type="XMLMAPPER" targetProject=".\src\main\Java">
+            <property name="enableSubPackages" value="true"/>
+
+        </javaClientGenerator>
+
+        <!--表名和对应生成的java对象-->
+        <table tableName="admin" domainObjectName="Admin"/>
+        <table tableName="user" domainObjectName="User"/>
+        <table tableName="diary" domainObjectName="Diary"/>
+        <table tableName="diarys" domainObjectName="Diarys"/>
+    </context>
+</generatorConfiguration>
